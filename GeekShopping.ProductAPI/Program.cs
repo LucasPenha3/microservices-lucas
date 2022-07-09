@@ -1,4 +1,8 @@
+using AutoMapper;
+using GeekShopping.ProductAPI.Config;
 using GeekShopping.ProductAPI.Model.Context;
+using GeekShopping.ProductAPI.Repository;
+using GeekShopping.ProductAPI.Repository.Implementations;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +16,15 @@ builder.Services.AddDbContext<MySQLContext>(
         new MySqlServerVersion(
             new Version(5, 7, 25))));
 
+// incluindo o automapper como singleton (usado para VO to entidade e vice versa)
+IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
+builder.Services.AddSingleton(mapper);
+
+// adicionando o automapper automatico
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+// injetando o product repository
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
